@@ -1,5 +1,6 @@
 package com.sahabuddin.blogappapis.controllers;
 
+import com.sahabuddin.blogappapis.payloads.ApiResponse;
 import com.sahabuddin.blogappapis.payloads.UserDto;
 import com.sahabuddin.blogappapis.services.UserService;
 import com.sahabuddin.blogappapis.services.impl.UserServiceImpl;
@@ -7,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -17,6 +19,16 @@ public class UserController {
 
     public UserController(UserServiceImpl userService) {
         this.userService = userService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<UserDto> getUserById(@PathVariable("userId") Long userId) {
+        return ResponseEntity.ok(userService.getUserById(userId));
     }
 
     @PostMapping
@@ -32,8 +44,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable("userId") Long userId) {
+    public ResponseEntity<ApiResponse> deleteUser(@PathVariable("userId") Long userId) {
         userService.deleteUser(userId);
-        return ResponseEntity.ok(Map.of("message", "User deleted"));
+        return new ResponseEntity<ApiResponse>(new ApiResponse("User Deleted", true), HttpStatus.OK);
     }
 }
