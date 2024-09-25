@@ -37,7 +37,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDto getPost(Long postId) {
-        return null;
+        return this.modelMapper.map( this.postRepository.findById(postId), PostDto.class);
     }
 
     @Override
@@ -63,7 +63,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<PostDto> getAllPosts() {
-        return List.of();
+        return this.postRepository.findAll().stream().map(post -> modelMapper.map(post, PostDto.class))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -88,6 +89,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public void deletePost(Long postId) {
-
+        Post post = this.postRepository.findById(postId).orElseThrow(() ->
+                new ResourceNotFoundException("Post", "post id", postId));
+        this.postRepository.delete(post);
     }
 }

@@ -1,6 +1,6 @@
 package com.sahabuddin.blogappapis.controllers;
 
-import com.sahabuddin.blogappapis.entities.Post;
+import com.sahabuddin.blogappapis.payloads.ApiResponse;
 import com.sahabuddin.blogappapis.payloads.PostDto;
 import com.sahabuddin.blogappapis.services.PostService;
 import jakarta.validation.Valid;
@@ -20,6 +20,16 @@ public class PostController {
         this.postService = postService;
     }
 
+    @GetMapping("/posts")
+    public ResponseEntity<List<PostDto>> getAllPosts() {
+        return ResponseEntity.ok(postService.getAllPosts());
+    }
+
+    @GetMapping("/posts/{postId}")
+    public ResponseEntity<PostDto> getPostById(@PathVariable Long postId) {
+        return ResponseEntity.ok(this.postService.getPost(postId));
+    }
+
     @GetMapping("/user/{userId}/posts")
     public ResponseEntity<List<PostDto>> getPosts(@PathVariable Long userId) {
         return ResponseEntity.ok(this.postService.getPostsByUser(userId));
@@ -35,6 +45,12 @@ public class PostController {
     public ResponseEntity<PostDto> createPost(@Valid @RequestBody PostDto postDto, @PathVariable Long userId,
                                               @PathVariable Long categoryId) {
         return new ResponseEntity<>(this.postService.createPost(postDto,userId,categoryId), HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/posts/{postId}")
+    public ResponseEntity<ApiResponse> deletePost(@PathVariable Long postId) {
+        this.postService.deletePost(postId);
+        return new ResponseEntity<>(new ApiResponse("Post deleted", true), HttpStatus.OK);
     }
 
 }
