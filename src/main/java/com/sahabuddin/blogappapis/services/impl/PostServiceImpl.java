@@ -5,11 +5,16 @@ import com.sahabuddin.blogappapis.entities.Post;
 import com.sahabuddin.blogappapis.entities.User;
 import com.sahabuddin.blogappapis.exceptions.ResourceNotFoundException;
 import com.sahabuddin.blogappapis.payloads.PostDto;
+import com.sahabuddin.blogappapis.payloads.PostResponse;
 import com.sahabuddin.blogappapis.repositories.CategoryRepository;
 import com.sahabuddin.blogappapis.repositories.PostRepository;
 import com.sahabuddin.blogappapis.repositories.UserRepository;
 import com.sahabuddin.blogappapis.services.PostService;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -37,7 +42,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDto getPost(Long postId) {
-        return this.modelMapper.map( this.postRepository.findById(postId), PostDto.class);
+        Post post = postRepository.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post", "post id", postId));
+        return this.modelMapper.map( post, PostDto.class);
     }
 
     @Override
@@ -62,9 +68,23 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostDto> getAllPosts() {
-        return this.postRepository.findAll().stream().map(post -> modelMapper.map(post, PostDto.class))
-                .collect(Collectors.toList());
+    public PostResponse getAllPosts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+        Sort sort = sortOrder.equalsIgnoreCase("asc")? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
+        Page<Post> allPosts = postRepository.findAll(pageable);
+        List<Post> posts = allPosts.getContent();
+        List<PostDto> postDtoList = posts.stream().map(post -> modelMapper.map(post, PostDto.class))
+                .toList();
+        PostResponse postResponse = new PostResponse();
+        postResponse.setContents(postDtoList);
+        postResponse.setPageNumber(allPosts.getNumber());
+        postResponse.setPageSize(allPosts.getSize());
+        postResponse.setTotalPages(allPosts.getTotalPages());
+        postResponse.setTotalElementsCount(allPosts.getNumberOfElements());
+        postResponse.setLastPage(allPosts.isLast());
+
+        return postResponse;
     }
 
     @Override
@@ -84,7 +104,13 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDto updatePost(PostDto postDto, Long postId) {
-        return null;
+        Post post = postRepository.findById(postId).orElseThrow(() ->
+                new ResourceNotFoundException("Post", "post id", postId));
+        post.setTitle(postDto.getTitle());
+        post.setContent(postDto.getContent());
+        post.setImageName(postDto.getImageName());
+
+        return modelMapper.map(postRepository.save(post), PostDto.class);
     }
 
     @Override
