@@ -1,10 +1,14 @@
 package com.sahabuddin.blogappapis.payloads;
 
 
+import com.sahabuddin.blogappapis.entities.Comment;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @NoArgsConstructor
 @Getter
@@ -24,5 +28,7 @@ public class PostDto {
     private CategoryDto category;
 
     private UserDto user;
+
+    private Set<CommentDto> comments = new HashSet<>();
 
 }
