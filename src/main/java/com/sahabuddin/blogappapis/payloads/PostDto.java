@@ -1,7 +1,5 @@
 package com.sahabuddin.blogappapis.payloads;
 
-
-import com.sahabuddin.blogappapis.entities.Comment;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
