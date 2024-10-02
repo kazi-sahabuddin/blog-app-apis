@@ -2,27 +2,42 @@ package com.sahabuddin.blogappapis.services.impl;
 
 import com.sahabuddin.blogappapis.entities.User;
 import com.sahabuddin.blogappapis.exceptions.ResourceNotFoundException;
+import com.sahabuddin.blogappapis.payloads.SignInRequest;
 import com.sahabuddin.blogappapis.payloads.UserDto;
 import com.sahabuddin.blogappapis.repositories.UserRepository;
+import com.sahabuddin.blogappapis.security.JwtTokenHelper;
 import com.sahabuddin.blogappapis.services.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
+    private final JwtTokenHelper jwtTokenHelper;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
 
-    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper) {
+    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper, AuthenticationManager authenticationManager, UserDetailsService userDetailsService, JwtTokenHelper jwtTokenHelper) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
+        this.authenticationManager = authenticationManager;
+        this.userDetailsService = userDetailsService;
+        this.jwtTokenHelper = jwtTokenHelper;
     }
 
 
@@ -58,6 +73,23 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long userId) {
         User user = this.userRepository.findById(userId).orElseThrow(()-> new ResourceNotFoundException("User", "Id", userId));
         this.userRepository.delete(user);
+    }
+
+    @Override
+    public String verify(SignInRequest request) {
+        log.info("Verifying user: {}", request);
+        log.info(userDetailsService.loadUserByUsername(request.getUsername()).getUsername());
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword());
+        try{
+            log.info("Attempting to verify user {}", usernamePasswordAuthenticationToken);
+            authenticationManager.authenticate(usernamePasswordAuthenticationToken);
+            log.info("Authentication Successful");
+            UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsername());
+            return jwtTokenHelper.generateToken(userDetails);
+        } catch (BadCredentialsException e) {
+            log.error(e.getMessage());
+            return "fail";
+        }
     }
 
     private User userDtoConvertToUser(UserDto userDto) {
