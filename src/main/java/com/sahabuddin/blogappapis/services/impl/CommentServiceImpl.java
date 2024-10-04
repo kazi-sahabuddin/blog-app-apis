@@ -7,9 +7,11 @@ import com.sahabuddin.blogappapis.payloads.CommentDto;
 import com.sahabuddin.blogappapis.repositories.CommentRepository;
 import com.sahabuddin.blogappapis.repositories.PostRepository;
 import com.sahabuddin.blogappapis.services.CommentService;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+@RequiredArgsConstructor
 @Service
 public class CommentServiceImpl implements CommentService {
 
@@ -18,12 +20,6 @@ public class CommentServiceImpl implements CommentService {
     private final PostRepository postRepository;
 
     private final ModelMapper modelMapper;
-
-    public CommentServiceImpl(CommentRepository commentRepository, PostRepository postRepository, ModelMapper modelMapper) {
-        this.commentRepository = commentRepository;
-        this.postRepository = postRepository;
-        this.modelMapper = modelMapper;
-    }
 
     @Override
     public CommentDto createComment(CommentDto commentDto, Long postId) {

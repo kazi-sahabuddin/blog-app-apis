@@ -10,6 +10,7 @@ import com.sahabuddin.blogappapis.repositories.CategoryRepository;
 import com.sahabuddin.blogappapis.repositories.PostRepository;
 import com.sahabuddin.blogappapis.repositories.UserRepository;
 import com.sahabuddin.blogappapis.services.PostService;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class PostServiceImpl implements PostService {
 
@@ -31,14 +33,6 @@ public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
 
     private final CategoryRepository categoryRepository;
-
-    public PostServiceImpl(PostRepository postRepository, ModelMapper modelMapper, UserRepository userRepository, CategoryRepository categoryRepository) {
-        this.postRepository = postRepository;
-        this.modelMapper = modelMapper;
-        this.userRepository = userRepository;
-        this.categoryRepository = categoryRepository;
-    }
-
 
     @Override
     public PostDto getPost(Long postId) {

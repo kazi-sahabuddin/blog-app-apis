@@ -1,6 +1,6 @@
 package com.sahabuddin.blogappapis.payloads;
 
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,9 +10,9 @@ import lombok.ToString;
 @ToString
 public class SignInRequest {
 
-    @NotEmpty
+    @NotBlank(message = "Username is required.")
     private String username;
 
-    @NotEmpty
+    @NotBlank(message = "Password is required.")
     private String password;
 }

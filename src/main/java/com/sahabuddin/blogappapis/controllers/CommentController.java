@@ -1,26 +1,22 @@
 package com.sahabuddin.blogappapis.controllers;
 
-import com.sahabuddin.blogappapis.entities.Comment;
 import com.sahabuddin.blogappapis.payloads.ApiResponse;
 import com.sahabuddin.blogappapis.payloads.CommentDto;
 import com.sahabuddin.blogappapis.services.CommentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@RequiredArgsConstructor
 @RestController
-@RequestMapping("/api")
+@RequestMapping(value = "/api")
 public class CommentController {
 
     private final CommentService commentService;
 
-    public CommentController(CommentService commentService) {
-        this.commentService = commentService;
-    }
-
     @PostMapping("/post/{postId}/comments")
     public ResponseEntity<CommentDto> createComment(@PathVariable Long postId, @RequestBody CommentDto commentDto) {
-
         return new ResponseEntity<>(commentService.createComment(commentDto, postId), HttpStatus.CREATED);
     }
 

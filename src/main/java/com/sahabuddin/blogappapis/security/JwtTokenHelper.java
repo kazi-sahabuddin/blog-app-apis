@@ -19,14 +19,13 @@ import java.util.function.Function;
 @Component
 public class JwtTokenHelper {
 
-    private String secretkey = "";
+    private final String secretKey;
 
     public JwtTokenHelper() {
-
         try {
             KeyGenerator keyGen = KeyGenerator.getInstance("HmacSHA256");
             SecretKey sk = keyGen.generateKey();
-            secretkey = Base64.getEncoder().encodeToString(sk.getEncoded());
+            secretKey = Base64.getEncoder().encodeToString(sk.getEncoded());
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException(e);
         }
@@ -47,7 +46,7 @@ public class JwtTokenHelper {
     }
 
     private SecretKey getKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretkey);
+        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -70,8 +69,8 @@ public class JwtTokenHelper {
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
-        final String userName = extractUserName(token);
-        return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        final String username = extractUserName(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
     private boolean isTokenExpired(String token) {

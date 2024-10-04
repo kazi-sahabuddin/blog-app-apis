@@ -1,12 +1,14 @@
 package com.sahabuddin.blogappapis.services.impl;
 
 import com.sahabuddin.blogappapis.entities.User;
+import com.sahabuddin.blogappapis.exceptions.ApiException;
 import com.sahabuddin.blogappapis.exceptions.ResourceNotFoundException;
 import com.sahabuddin.blogappapis.payloads.SignInRequest;
 import com.sahabuddin.blogappapis.payloads.UserDto;
 import com.sahabuddin.blogappapis.repositories.UserRepository;
 import com.sahabuddin.blogappapis.security.JwtTokenHelper;
 import com.sahabuddin.blogappapis.services.UserService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,32 +16,28 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
+@RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+
     private final ModelMapper modelMapper;
+
     private final AuthenticationManager authenticationManager;
+
     private final UserDetailsService userDetailsService;
+
     private final JwtTokenHelper jwtTokenHelper;
 
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
-
-    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper, AuthenticationManager authenticationManager, UserDetailsService userDetailsService, JwtTokenHelper jwtTokenHelper) {
-        this.userRepository = userRepository;
-        this.modelMapper = modelMapper;
-        this.authenticationManager = authenticationManager;
-        this.userDetailsService = userDetailsService;
-        this.jwtTokenHelper = jwtTokenHelper;
-    }
-
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDto getUserById(Long userId) {
@@ -88,7 +86,7 @@ public class UserServiceImpl implements UserService {
             return jwtTokenHelper.generateToken(userDetails);
         } catch (BadCredentialsException e) {
             log.error(e.getMessage());
-            return "fail";
+           throw new ApiException("Invalid username or password");
         }
     }
 

@@ -5,22 +5,21 @@ import com.sahabuddin.blogappapis.payloads.UserDto;
 import com.sahabuddin.blogappapis.services.UserService;
 import com.sahabuddin.blogappapis.services.impl.UserServiceImpl;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping(value = "/api/users")
 public class UserController {
 
     private final UserService userService;
-
-    public UserController(UserServiceImpl userService) {
-        this.userService = userService;
-    }
 
     @GetMapping
     public ResponseEntity<List<UserDto>> getAllUsers() {
@@ -44,6 +43,7 @@ public class UserController {
         return ResponseEntity.ok(updateUser);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{userId}")
     public ResponseEntity<ApiResponse> deleteUser(@PathVariable("userId") Long userId) {
         userService.deleteUser(userId);

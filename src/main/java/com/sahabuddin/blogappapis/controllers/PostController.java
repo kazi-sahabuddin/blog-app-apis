@@ -8,6 +8,7 @@ import com.sahabuddin.blogappapis.services.FileService;
 import com.sahabuddin.blogappapis.services.PostService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -22,8 +23,9 @@ import java.io.InputStream;
 import java.util.List;
 
 @Slf4j
+@RequiredArgsConstructor
 @RestController
-@RequestMapping("/api")
+@RequestMapping(value = "/api")
 public class PostController {
 
     private final PostService postService;
@@ -32,11 +34,6 @@ public class PostController {
 
     @Value("${project.image}")
     private String path;
-
-    public PostController(PostService postService, FileService fileService) {
-        this.postService = postService;
-        this.fileService = fileService;
-    }
 
     @GetMapping("/posts")
     public ResponseEntity<PostResponse> getAllPosts(
@@ -92,14 +89,12 @@ public class PostController {
         StreamUtils.copy(resource,response.getOutputStream());
     }
 
-
     @PostMapping("/post/image/upload/{postId}")
     public ResponseEntity<PostDto> uploadPostImage(@PathVariable Long postId, @RequestParam("file") MultipartFile file) throws IOException {
         PostDto postDto = postService.getPost(postId);
         String fileName = fileService.uploadImage(path, file);
         postDto.setImageName(fileName);
         return ResponseEntity.ok(postService.updatePost(postDto, postId));
-
     }
 
 }
