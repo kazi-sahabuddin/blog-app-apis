@@ -1,7 +1,7 @@
 package com.sahabuddin.blogappapis.services;
 
-import com.sahabuddin.blogappapis.entities.Post;
 import com.sahabuddin.blogappapis.payloads.PostDto;
+import com.sahabuddin.blogappapis.payloads.PostResponse;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public interface PostService {
 
     List<PostDto> searchPosts(String searchTerm);
 
-    List <PostDto> getAllPosts();
+    PostResponse getAllPosts(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder);
 
     PostDto createPost(PostDto postDto, Long userId, Long categoryId);
 
