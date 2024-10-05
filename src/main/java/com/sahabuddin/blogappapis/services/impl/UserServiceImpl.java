@@ -1,10 +1,13 @@
 package com.sahabuddin.blogappapis.services.impl;
 
+import com.sahabuddin.blogappapis.config.AppConstants;
+import com.sahabuddin.blogappapis.entities.Role;
 import com.sahabuddin.blogappapis.entities.User;
 import com.sahabuddin.blogappapis.exceptions.ApiException;
 import com.sahabuddin.blogappapis.exceptions.ResourceNotFoundException;
 import com.sahabuddin.blogappapis.payloads.SignInRequest;
 import com.sahabuddin.blogappapis.payloads.UserDto;
+import com.sahabuddin.blogappapis.repositories.RoleRepository;
 import com.sahabuddin.blogappapis.repositories.UserRepository;
 import com.sahabuddin.blogappapis.security.JwtTokenHelper;
 import com.sahabuddin.blogappapis.services.UserService;
@@ -19,7 +22,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -38,6 +43,8 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenHelper jwtTokenHelper;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final RoleRepository roleRepository;
 
     @Override
     public UserDto getUserById(Long userId) {
@@ -88,6 +95,24 @@ public class UserServiceImpl implements UserService {
             log.error(e.getMessage());
            throw new ApiException("Invalid username or password");
         }
+    }
+
+    @Override
+    public UserDto registerNewUser(UserDto userDto) {
+
+        User user = this.modelMapper.map(userDto, User.class);
+
+        user.setPassword(this.passwordEncoder.encode(user.getPassword()));
+
+        Role role = roleRepository.findById(AppConstants.NORMAL_USER).get();
+        log.info("Registering new user role: {}", role.getName());
+        Set<Role> roles = new HashSet<>();
+        roles.add(role);
+        user.setRoles(roles);
+
+        User newUser = userRepository.save(user);
+
+        return this.modelMapper.map(newUser, UserDto.class);
     }
 
     private User userDtoConvertToUser(UserDto userDto) {

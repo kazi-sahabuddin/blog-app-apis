@@ -6,4 +6,6 @@ public final class AppConstants {
     public static final String PAGE_SIZE = "10";
     public static final String SORT_BY = "postId";
     public static final String SORT_ORDER = "asc";
+    public static final Long ADMIN_USER = 601L;
+    public static final Long NORMAL_USER = 602L;
 }

@@ -19,4 +19,6 @@ public interface UserService {
     void deleteUser(Long userId);
 
     String verify(SignInRequest request);
+
+    UserDto registerNewUser(UserDto userDto);
 }

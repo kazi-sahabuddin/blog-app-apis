@@ -1,10 +1,13 @@
 package com.sahabuddin.blogappapis.payloads;
 
+import com.sahabuddin.blogappapis.entities.Role;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,4 +30,6 @@ public class UserDto {
 
     @NotEmpty
     private String about;
+
+    private List<Role> roles;
 }

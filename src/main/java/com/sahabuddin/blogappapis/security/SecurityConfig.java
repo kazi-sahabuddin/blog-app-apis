@@ -25,7 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    public static final String[] PUBLIC_URLS = {"/api/login/**"};
+    public static final String[] PUBLIC_URLS = {"/api/auth/**"};
 
     private final CustomUserDetailsService customUserDetailsService;
 
@@ -37,8 +37,6 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
                         .requestMatchers(PUBLIC_URLS)
-                        .permitAll()
-                        .requestMatchers(HttpMethod.GET)
                         .permitAll()
                         .anyRequest()
                         .authenticated())
